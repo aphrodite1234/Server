@@ -1,46 +1,76 @@
 package jdbc;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.sql.ResultSet;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.json.JSONObject;
 
 public class DataDeal {
 
-	private boolean empty;
 	private String message = "";
 	private JSONObject object;
+	private ReentrantLock mLock = new ReentrantLock();
+	private Condition mCondition = mLock.newCondition();
 	
 	public DataDeal() {
-		
+
 	}
-	public synchronized void deal(String str) {	
-		while(!empty) {
-			try {
-				wait();
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+	
+	public void deal(String str) {
+		mLock.lock();
 		message = sql(str);
-		System.out.println("datadeal:"+message);
-		empty = false;
-		notify();
+		System.out.println(Thread.currentThread()+"datadeal:    "+message);
+		mCondition.signal();
+		mLock.unlock();
 	}
-	public synchronized String get() {
-		while(empty) {
-			try {
-				wait();
-			}catch(Exception e) {
-				e.printStackTrace();
+	
+	public String get() {
+		String str;
+		try {
+			mLock.lockInterruptibly();
+			while(message==null) {
+				mCondition.await();
 			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			e.printStackTrace();
 		}
-		String str = message;
-		message = "";
-		empty = true;
-		notify();
+		str = message;
+		message=null;
+		mLock.unlock();
 		return str;
 	}
+	
+//	public synchronized void deal(String str) {	
+//		
+//		while(!empty) {
+//			try {
+//				wait();
+//			}catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		message = sql(str);
+//		System.out.println(Thread.currentThread()+"datadeal:    "+message);
+//		empty = false;
+//		notify();
+//	}
+//	public synchronized String get() {
+//		
+//		while(empty) {
+//			try {
+//				wait();
+//			}catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		String str = message;
+//		message = "";
+//		empty = true;
+//		notify();
+//		return str;
+//	}
 	
 	private String sql(String str) {
 		DBCon db = new DBCon();

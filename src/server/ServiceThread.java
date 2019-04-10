@@ -2,13 +2,12 @@ package server;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
-
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 
 import jdbc.DataDeal;
 
-public class ServiceThread extends Thread {
+public class ServiceThread implements Runnable {
 
 	private BufferedReader reader;
 	private PrintWriter writer;
@@ -16,6 +15,7 @@ public class ServiceThread extends Thread {
 	private String sendmsg = "";
 	private String receivemsg = "";
 	DataDeal dataDeal = new DataDeal();
+	private List<Socket> socketList= new ArrayList<>();
 
 	public String getSendmsg() {
 		return sendmsg;
@@ -37,27 +37,31 @@ public class ServiceThread extends Thread {
 
 	}
 
-	public ServiceThread(Socket socket,DataDeal dataDeal) {
+	public ServiceThread(Socket socket ,List<Socket> socketList) {
 		client = socket;
-		this.dataDeal = dataDeal;
+		this.socketList=socketList;
 	}
 
 	public void run() {
 		try {
 			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			writer = new PrintWriter(client.getOutputStream(), true);
 			// 接收消息线程
-			new Thread() {
+			new Thread("receive") {
 				public void run() {
 					try {
 						receivemsg = reader.readLine();
 						while (receivemsg.length()>0) {
-							System.out.println("客户端" + client.getInetAddress() + "：" + receivemsg);
+							System.out.println(Thread.currentThread()+"客户端" + client.getInetAddress() + "：" + receivemsg);
 							dataDeal.deal(receivemsg);
 							receivemsg = reader.readLine();
 						}
 					} catch (Exception e) {
 						try {
+							
+							writer.close();
 							client.close();
+							socketList.remove(client);
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
@@ -65,16 +69,17 @@ public class ServiceThread extends Thread {
 					}
 				}
 			}.start();
-			// 发送消息
-			//BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			writer = new PrintWriter(client.getOutputStream(), true);
+					
+			//发送消息
 			while (true) {
 				sendmsg = dataDeal.get();
 				writer.println(sendmsg);
-			}
+			}		
 		} catch (Exception e) {
 			try {
+				reader.close();
 				client.close();
+				socketList.remove(client);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

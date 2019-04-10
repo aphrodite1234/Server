@@ -1,15 +1,12 @@
 package server;
 
-import jdbc.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
+import jdbc.DataDeal;
 
 public class SerCon {
 
@@ -17,21 +14,7 @@ public class SerCon {
 	private final int PORT = 5678;
 	private ServerSocket server;
 	private Socket client;
-	private String sendmsg = "";
-	private String receivemsg = "";
 	
-	public String getSendmsg() {
-		return sendmsg;
-	}
-	public void setSendmsg(String sendmsg) {
-		this.sendmsg = sendmsg;
-	}
-	public String getReceivemsg() {
-		return receivemsg;
-	}
-	public void setReceivemsg(String receivemsg) {
-		this.receivemsg = receivemsg;
-	}
 	public SerCon() {
 		try {
 			server = new ServerSocket(PORT);
@@ -46,11 +29,14 @@ public class SerCon {
 	        while (true)
 	        {     
 	            client =server.accept();   
-	        	//socketList.add(client);
+	        	socketList.add(client);
 	        	System.out.println("客户端"+client.getInetAddress());
-	        	//new ServiceThread(client).start();
-	        	ServiceThread serviceThread = new ServiceThread(client,dataDeal);
-	        	serviceThread.start();
+
+	        	Send send = new Send(client,dataDeal);
+	        	Thread sendt = new Thread(send,"SEND");
+	        	sendt.start();
+	        	Receive receive = new Receive(client,dataDeal,sendt);
+	        	new Thread(receive,"RECEIVE").start();
 	        }       
 	    } catch (Exception e)
 	    {

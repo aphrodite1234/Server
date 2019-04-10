@@ -1,34 +1,40 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import jdbc.DataDeal;
 
-public class Send extends Thread{
+public class Send implements Runnable{
 
 	private PrintWriter writer;
-	private String message;
 	private Socket client;
+	private String message;
+	DataDeal dataDeal = new DataDeal();
 	
-	public String getMeassage() {
-		return message;
-	}
-	public void setMeassage(String message) {
-		this.message = message;
-	}
-	public Send(Socket socket) {
+	public Send(Socket socket,DataDeal dataDeal) {
 		client = socket;
+		this.dataDeal = dataDeal;
 	}
+	
+	public Send() {
+	}
+
 	public void run() {
 		try {
 			writer = new PrintWriter(client.getOutputStream(),true);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));		
-			while((message = reader.readLine())!=null) {
+			while(!Thread.currentThread().isInterrupted()) {
+				message = dataDeal.get();
 				writer.println(message);
 			}
 		}catch(Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
+			try {
+				writer.close();
+				client.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }
