@@ -6,10 +6,10 @@ import org.json.JSONObject;
 public class User {
 	
 	private JSONObject json = new JSONObject();
-	private String userName ;
-	private String passWord;
-	private String realName;
-	private int phonenum;
+	private String userName = "";
+	private String passWord = "";
+	private String realName = "";
+	private int phonenum = 0;
 	public String getUserName() {
 		return userName;
 	}
