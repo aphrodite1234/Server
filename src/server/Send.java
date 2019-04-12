@@ -3,6 +3,9 @@ package server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
 import jdbc.DataDeal;
 
 public class Send implements Runnable{
@@ -11,7 +14,16 @@ public class Send implements Runnable{
 	private Socket client;
 	private String message;
 	DataDeal dataDeal = new DataDeal();
+	private Map<String,Socket> socketMap= new HashMap<>();
 	
+	public Map<String,Socket> getSocketMap() {
+		return socketMap;
+	}
+
+	public void setSocketMap(Map<String,Socket> socketMap) {
+		this.socketMap = socketMap;
+	}
+
 	public Send(Socket socket,DataDeal dataDeal) {
 		client = socket;
 		this.dataDeal = dataDeal;
