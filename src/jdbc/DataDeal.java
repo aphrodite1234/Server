@@ -115,7 +115,7 @@ public class DataDeal {
 		try {
 			String qun = object.getString("用户名");
 			String message = object.getString("密码");
-			String sql = "SELECT login.username FROM groupmember,login WHERE groupname ='" + qun//查找在线群成员
+			String sql = "SELECT login.username FROM groupmember,login WHERE groupname ='" + qun// 查找在线群成员
 					+ "' AND groupmember.username = login.username" + " AND login.lstatus = 1 ";
 			rs = db.executeQuery(sql);
 			while (rs.next()) {
@@ -123,7 +123,7 @@ public class DataDeal {
 				qunList.add(rs.getString("login.username"));
 			}
 			for (String string : qunList) {
-				Socket socket = socketMap.get(string);//给在线群成员发消息
+				Socket socket = socketMap.get(string);// 给在线群成员发消息
 				if (socket != null && !string.equals(user.getUserName())) {
 					PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 					writer.println(user.getUserName() + " : " + message);
@@ -157,7 +157,7 @@ public class DataDeal {
 				login.setDate(goodsC_date);
 				login.setStatus(1);
 
-				String sql2 = "UPDATE login SET lip='" + login.getIp() + "',lport='" + login.getPort() + "',ldate='"// 更新登录信息
+				String sql2 = "UPDATE login SET lip='" + login.getIp() + "',lport=" + login.getPort() + ",ldate='"// 更新登录信息
 						+ login.getDate() + "', lstatus=" + login.getStatus() + " WHERE username = '" + username + "'";
 				user.setUserName(username);
 				db.exercuteUpdate(sql2);
@@ -174,12 +174,10 @@ public class DataDeal {
 
 	public void signout() {// 退出登录
 		DBCon db = new DBCon();
-		login.setStatus(0);
 		// System.out.println(socketMap);
 		socketMap.remove(user.getUserName());
 		// System.out.println(socketMap);
-		String sql = "UPDATE login SET lstatus = '" + login.getStatus() + "' WHERE username ='" + user.getUserName()
-				+ "'";
+		String sql = "UPDATE login SET lstatus = 0 WHERE username ='" + user.getUserName()+ "'";
 		db.exercuteUpdate(sql);
 		db.close();
 	}

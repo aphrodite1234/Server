@@ -1,5 +1,6 @@
 package jdbc;
 
+import java.net.Socket;
 import java.sql.Timestamp;
 
 public class Login {
@@ -39,5 +40,4 @@ public class Login {
 	public void setDate(Timestamp date) {
 		this.date = date;
 	}
-
 }

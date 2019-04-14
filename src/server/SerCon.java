@@ -13,7 +13,7 @@ import jdbc.Login;
 public class SerCon {
 
 	Map<String,Socket> socketMap= new HashMap<>();
-	private final int PORT = 5678;
+	private final int PORT = 5679;
 	private ServerSocket server;
 	private Socket client;
 	
