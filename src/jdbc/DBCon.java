@@ -9,9 +9,10 @@ public class DBCon {
     // 数据库的用户名与密码
     static final String USER = "root";
     static final String PASS = "5780..an";
-    Connection con =null;
+    public Connection con =null;
     Statement stmt = null;
     ResultSet rs = null;
+    public PreparedStatement ps;
     
     public DBCon() {
     	try {

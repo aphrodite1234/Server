@@ -5,6 +5,9 @@ public class Group {
 	private int groupid;
 	private String groupname;
 	private String groupowner;
+	private String ownername;
+	private int membernum;
+	
 	public int getGroupid() {
 		return groupid;
 	}
@@ -22,5 +25,17 @@ public class Group {
 	}
 	public void setGroupowner(String groupowner) {
 		this.groupowner = groupowner;
+	}
+	public String getOwnername() {
+		return ownername;
+	}
+	public void setOwnername(String ownername) {
+		this.ownername = ownername;
+	}
+	public int getMembernum() {
+		return membernum;
+	}
+	public void setMembernum(int membernum) {
+		this.membernum = membernum;
 	}
 }

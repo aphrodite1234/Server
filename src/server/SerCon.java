@@ -8,14 +8,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import jdbc.DataDeal;
-import jdbc.Login;
 
 public class SerCon {
 
 	Map<String,Socket> socketMap= new HashMap<>();
-	private final int PORT = 5679;
+	private final int PORT = 5678;
 	private ServerSocket server;
 	private Socket client;
+	
 	
 	public SerCon() {
 		try {
@@ -30,25 +30,15 @@ public class SerCon {
 	        while (true)
 	        {     
 	        	client =server.accept();
-	    		DataDeal dataDeal = new DataDeal();
+	    		DataDeal dataDeal = new DataDeal(client);
 	    		dataDeal.setSocketMap(socketMap);
 	    		dataDeal.setSocket(client);
 	    		
-	    		Login login = new Login();//储存登录信息
-	            dataDeal.setLogin(login);	        	
 	        	Date date = new Date();//Socket链接时间
-	        	String sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-	        	login.setIp(client.getInetAddress().toString());
-	        	login.setPort(client.getPort());
-	        	System.out.println(sd+login.getIp()+"/"+login.getPort());
+	        	String sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);      	
+	        	System.out.println(sd+client);
 
-	        	Send send = new Send(client,dataDeal);
-	        	send.setSocketMap(socketMap);
-	        	Thread sendt = new Thread(send,"SEND");
-	        	sendt.start();
-	        	
-	        	Receive receive = new Receive(client,dataDeal,sendt);
-	        	receive.setLogin(login);
+	        	Receive receive = new Receive(client,dataDeal);
 	        	new Thread(receive,"RECEIVE").start();
 	        }       
 	    } catch (Exception e)
